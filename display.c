@@ -39,15 +39,9 @@ uint8_t toDisplay[] = {8,8,8,8,8};
 void display_blank(void);
 
 void display_init() {
-  int j;
   // Put digit pins into output mode
   DDRB = _BV(DDB5) | _BV(DDB4); // Digits 4 (SCK), 5 (MISO)
   DDRC = _BV(DDC4) | _BV(DDC3)  | _BV(DDC1); // Digits 1, 2, L
-
-  PORTC = _BV(PORTC3); // Digit 2
-  for(j=0; j<7; j++) {
-    set_segment(j, seven_seg_digits[8][j]);
-  }
 }
 
 void display_show() {

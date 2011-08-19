@@ -3,6 +3,7 @@
 #include "clock.h"
 
 #include <avr/interrupt.h>
+#include <avr/sleep.h>
 
 void init(void);
 
@@ -30,6 +31,11 @@ int main(void) {
     toDisplay[2] = (clock.subseconds / 10) % 10;
     toDisplay[3] = (clock.subseconds % 10);
     toDisplay[4] = (clock.seconds % 2) ? 2 : 15;
+
+    set_sleep_mode(SLEEP_MODE_IDLE);
+    sleep_enable();
+    sleep_cpu();
+    sleep_disable();
   }
 }
 
