@@ -6,10 +6,16 @@ static void _update(button_t *button);
 
 void buttons_age() {
   int i;
+  uint8_t pressCount = 0;
 
   for(i=0; i<BUTTON_COUNT; i++) {
     buttons[i].old = buttons[i].current;
+    if (buttons[i].current) {
+      pressCount++;
+    }
   }
+
+  multiPress = (pressCount > 1);
 }
 
 void buttons_update() {
@@ -28,18 +34,18 @@ void buttons_update() {
     }
   }
 
-  multiPress = (pressCount > 1);
+  multiPress = (pressCount > 1) || multiPress;
 }
 
 bool_t pressed(button_t *button) {
-  return (button->old == DOWN) && (button->current == UP);
+  return (button->old == UP) && (button->current == DOWN);
 }
 
 static void _update(button_t *button) {
   button_state_t state = !(*button->port & _BV(button->pin));
 
   if (state != button->current) {
-    if (button->update_time + 4 < clock_ticks) {
+    if (button->update_time + 1 < clock_ticks) {
       button->old = button->current;
       button->current = state;
       button->update_time = clock_ticks;

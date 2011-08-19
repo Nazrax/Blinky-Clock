@@ -32,6 +32,7 @@ void init() {
 }
 
 int main(void) {
+  uint8_t count = 0;
   init();
 
   clock_init();
@@ -43,30 +44,41 @@ int main(void) {
     clock_update();
     buttons_update();
 
-    if (pressed(&buttons[0])) {
-      PORTD ^= _BV(PORTD6);
+    if (!multiPress) {
+      if (pressed(&buttons[0]) || (buttons[0].current && longPress && clock_ticked)) {
+        count++;
+      }
+      if (pressed(&buttons[1]) || (buttons[1].current && longPress && clock_ticked)) {
+        count--;
+      }
     }
 
-      /*
-    if (longPress) {
+
+    if (multiPress) {
       PORTD |= _BV(PORTD6);
     } else {
       PORTD &= ~(_BV(PORTD6));
     }
-      */
-    /*
     toDisplay[0] = (clock.seconds / 10) % 10;
     toDisplay[1] = clock.seconds % 10; 
     toDisplay[2] = (clock.subseconds / 10) % 10;
     toDisplay[3] = (clock.subseconds % 10);
-    */
 
+    /*
     toDisplay[0] = buttons[0].current;
     toDisplay[1] = buttons[1].current;
     toDisplay[2] = buttons[2].current;
     toDisplay[3] = buttons[3].current;
-    buttons_age();
 
+
+    toDisplay[0] = (count/1000)%10;
+    toDisplay[1] = (count/100)%10;
+    toDisplay[2] = (count/10)%10;
+    toDisplay[3] = count%10;
+    */
+
+    buttons_age();
+    clock_ticked = false;
     set_sleep_mode(SLEEP_MODE_IDLE);
     sleep_enable();
     sleep_cpu();
