@@ -1,0 +1,67 @@
+//#define F_CPU 1000000
+
+typedef struct {
+  int ddr_pin;
+  int port_pin;
+} pin_t;
+
+pin_t seg_a;
+seg_a.port_pin = 1;
+seg_a.ddr_pin = 1;
+
+int main(void) {
+  for(;;) {}
+}
+
+
+//#include <avr/io.h>
+//#include <util/delay.h>
+
+//#define DELAY 250
+
+  //volatile uint8_t ** ddr;
+  //volatile uint8_t ** port;
+
+
+//seg_a.port = PORTD;
+//seg_a.ddr = DDRD;
+
+//#define segment_on(segment) segment.ddr |= _BV(segment.ddr_pin)
+//#define segment_off(segment) segment.ddr &= ~(_BV(segment.ddr_pin)
+
+//#define a_on() DDRD |= _BV(DDD1)
+//#define a_off() DDRD &= ~(_BV(DDD1))
+/*
+#define a_on segment_on(seg_a)
+#define a_off segment_off(seg_a)
+#define b_on() DDRC |= _BV(DDC5)
+#define b_off() DDRC &= ~(_BV(DDC5))
+#define c_on() DDRD |= _BV(DDD2)
+#define c_off() DDRD &= ~(_BV(DDD2))
+#define d_on() DDRC |= _BV(DDC2)
+#define d_off() DDRC &= ~(_BV(DDC2))
+#define e_on() DDRC |= _BV(DDC0)
+#define e_off()DDRC &= ~(_BV(DDC0))
+#define f_on() DDRB |= _BV(DDB3)
+#define f_off()DDRB &= ~(_BV(DDB3))
+#define g_on() DDRD |= _BV(DDD0)
+#define g_off() DDRD &= ~(_BV(DDD0))
+
+int main(void) {
+  int i;
+
+  DDRB = _BV(DDB5) | _BV(DDB4); // Digits 4 (SCK), 5 (MISO)
+  DDRC = _BV(DDC4) | _BV(DDC3)  | _BV(DDC1); // Digits 1, 2, L
+
+  PORTC = _BV(PORTC4); // Digit 1
+
+  for(;;) {
+    //a_on();
+    _delay_ms(1000);
+    //a_off();
+    _delay_ms(1000);
+  }
+}
+*/
+
+
