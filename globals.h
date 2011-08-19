@@ -4,7 +4,7 @@
 #include <avr/io.h>
 #include "types.h"
 
-#define F_CPU 8000000
+#define F_CPU 1000000
 
 #include <avr/io.h>
 #include <util/delay.h>

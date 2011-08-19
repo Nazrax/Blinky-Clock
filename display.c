@@ -31,7 +31,7 @@ uint8_t seven_seg_digits[20][7] = { { 1,1,1,1,1,1,0 }, // 0
                                     { 1,1,0,0,1,1,1 }, // P 18
                                     { 0,0,0,0,1,0,1 }  // r 19
 };
-
+  
 
 static uint8_t current_digit = 0;
 uint8_t toDisplay[] = {8,8,8,8,8};
@@ -39,15 +39,21 @@ uint8_t toDisplay[] = {8,8,8,8,8};
 void display_blank(void);
 
 void display_init() {
+  int j;
   // Put digit pins into output mode
-  DDRB = _BV(DDB5) | _BV(DDB4); // Digits 4 & 5
+  DDRB = _BV(DDB5) | _BV(DDB4); // Digits 4 (SCK), 5 (MISO)
   DDRC = _BV(DDC4) | _BV(DDC3)  | _BV(DDC1); // Digits 1, 2, L
+
+  PORTC = _BV(PORTC3); // Digit 2
+  for(j=0; j<7; j++) {
+    set_segment(j, seven_seg_digits[8][j]);
+  }
 }
 
 void display_show() {
   TCCR0A |= _BV(WGM01); // CTC mode
   TCCR0B |= _BV(CS02) | _BV(CS00); // Clock / 1024
-  OCR0A = 40; // Fire about 40 times / second (@8Mhz)
+  OCR0A = 20; // Fire about 40 times / second (@8Mhz)
   TIMSK0 |= _BV(OCIE0A); // Enable CTC interrupt for OCR0A
 }
 
@@ -63,7 +69,7 @@ void display_hide() {
   display_blank();
 }
 
-ISR(TIMER1_COMPA_vect) {
+ISR(TIMER0_COMPA_vect) {
   int i;
   display_blank();
 
@@ -73,15 +79,15 @@ ISR(TIMER1_COMPA_vect) {
   }
 
   if (current_digit == 0) {
-    DDRC |= _BV(DDC4);
+    PORTC |= _BV(PORTC4);
   } else if (current_digit == 1) {
-    DDRC |= _BV(DDC3);
+    PORTC |= _BV(PORTC3);
   } else if (current_digit == 2) {
-    DDRB |= _BV(DDB5);
+    PORTB |= _BV(PORTB5);
   } else if (current_digit == 3) {
-    DDRB |= _BV(DDB4);
+    PORTB |= _BV(PORTB4);
   } else if (current_digit == 4) { // L1L2L3
-    DDRC |= _BV(DDC1);
+    PORTB |= _BV(PORTC1);
   }
 
   for(i=0; i<7; i++) {

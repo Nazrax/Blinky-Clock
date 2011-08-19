@@ -37,6 +37,8 @@ void clock_update() {
 
 // The clock
 ISR(TIMER2_COMPA_vect) {
+  PORTD ^= _BV(PORTD6);
+
   clock_ticks++;
   clock.subseconds++;
 }
