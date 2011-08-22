@@ -45,10 +45,10 @@ void display_init() {
 }
 
 void display_show() {
-  TCCR0A |= _BV(WGM01); // CTC mode
-  TCCR0B |= _BV(CS02) | _BV(CS00); // Clock / 1024
-  OCR0A = 20; // Fire about 40 times / second (@8Mhz)
-  TIMSK0 |= _BV(OCIE0A); // Enable CTC interrupt for OCR0A
+  TCCR1A |= _BV(WGM11); // CTC mode, top = OCRA
+  TCCR1B |= _BV(CS12) | _BV(CS10); // Clock / 1024
+  OCR1A = 20; // Fire about 40 times / second (@8Mhz)
+  TIMSK1 |= _BV(OCIE1A); // Enable CTC interrupt for OCRaA
 }
 
 void display_blank() {
@@ -63,7 +63,7 @@ void display_hide() {
   display_blank();
 }
 
-ISR(TIMER0_COMPA_vect) {
+ISR(TIMER1_COMPA_vect) {
   int i;
   display_blank();
 
