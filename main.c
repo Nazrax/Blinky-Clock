@@ -5,6 +5,7 @@
 
 #include <avr/interrupt.h>
 #include <avr/sleep.h>
+#include <avr/eeprom.h>
 
 void init(void);
 void handle_buttons(void);
@@ -12,11 +13,37 @@ void handle_display(void);
 void handle_display_setting(void);
 void handle_display_modename(void);
 void handle_alarm(void);
+void update_eeprom(void);
+void fetch_eeprom(void);
 
 static mode_t mode = mode_off;
 static uint32_t last_mode_switch_ticks = 0;
-static uint16_t alarm_time = 0;
-static uint16_t nap_time = 0;
+static int16_t alarm_time = 0;
+static int16_t nap_time = 0;
+static bool_t dirty;
+
+static uint8_t EEMEM eeprom_adjustment = 0;
+static uint16_t EEMEM eeprom_nap_time = 0;
+static uint16_t EEMEM eeprom_alarm_time = 0;
+
+void update_eeprom() {
+  if (dirty) {
+    if (mode == mode_alarm) {
+      eeprom_write_word(&eeprom_alarm_time, alarm_time);
+    } else if (mode == mode_nap) {
+      eeprom_write_word(&eeprom_nap_time, nap_time);
+    } else if (mode == mode_adjustment) {
+      eeprom_write_byte(&eeprom_adjustment, adjustment);
+    }
+    dirty = false;
+  }
+}
+
+void fetch_eeprom() {
+  alarm_time = eeprom_read_word(&eeprom_alarm_time);
+  nap_time = eeprom_read_word(&eeprom_nap_time);
+  adjustment = eeprom_read_byte(&eeprom_adjustment);
+}
 
 void init() {
   CLKPR = _BV(CLKPCE); // Enable prescaler change
@@ -40,6 +67,7 @@ void init() {
   buttons[3].port = &PIND;
 
   display_init();
+  fetch_eeprom();
 }
 
 // 0: Up
@@ -64,6 +92,7 @@ void handle_buttons() {
       } else if (pressed(&buttons[1])) { // Down
         delta = -1;
       } else if (pressed(&buttons[2])) { // Mode
+        update_eeprom();
         if (mode >= mode_nap) {
           mode = mode_clock;
         } else {
@@ -91,19 +120,34 @@ void handle_buttons() {
           }
         }
       } else if (mode == mode_alarm) {
-        alarm_time++;
+        dirty = true;
+        alarm_time += delta;
         if (alarm_time >= 60 * 24) {
           alarm_time = 0;
         } else if (alarm_time < 0) {
           alarm_time = 60 * 24 - 1;
         }
       } else if (mode == mode_nap) {
-        nap_time++;
+        dirty = true;
+        nap_time += delta;
         if (nap_time >= 60 * 24) {
           nap_time = 0;
         } else if (nap_time < 0) {
           nap_time = 60 * 24 - 1;
         }
+      } else if (mode == mode_adjustment) {
+        dirty = true;
+        adjustment += delta;
+      }
+    }
+  } else { // multipress
+    if (buttons[2].current) {
+      if (pressed(&buttons[0])) {
+        update_eeprom();
+        mode = mode_seconds;
+      } else if (pressed(&buttons[1])) {
+        update_eeprom();
+        mode = mode_adjustment;
       }
     }
   }
@@ -186,6 +230,8 @@ void handle_display() {
 
     if (ticks_since_button > TICKS_PER_SECOND * 90) {
       display_hide();
+      update_eeprom();
+      mode = mode_off;
     } else if (ticks_since_mode_change > TICKS_PER_SECOND) {
       handle_display_setting();
     } else {
