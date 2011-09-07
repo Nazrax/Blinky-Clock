@@ -3,12 +3,13 @@
 
 typedef enum {false, true} bool_t;
 typedef enum { UP, DOWN } button_state_t;
+typedef enum { mode_off, mode_clock, mode_alarm, mode_nap, mode_seconds, mode_adjustment } mode_t;
 
 typedef struct {
-  unsigned int subseconds:10;
-  unsigned char seconds:6;
-  unsigned char minutes:6;
-  unsigned char hours:5;
+  int16_t subseconds;
+  int8_t seconds;
+  int8_t minutes;
+  int8_t hours;
 } clock_t;
 
 typedef struct {

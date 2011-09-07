@@ -1,8 +1,13 @@
 #include "globals.h"
 #include "buttons.h"
-
+#include "clock.h"
 
 static void _update(button_t *button);
+
+uint32_t last_button_press_ticks = 0;
+
+button_t buttons[BUTTON_COUNT];
+bool_t longPress, multiPress;
 
 void buttons_age() {
   int i;
@@ -16,6 +21,9 @@ void buttons_age() {
   }
 
   multiPress = (pressCount > 1);
+  if (pressCount > 0) {
+    last_button_press_ticks = clock_ticks;
+  }
 }
 
 void buttons_update() {

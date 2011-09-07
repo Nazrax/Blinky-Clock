@@ -12,14 +12,4 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
-
-// Clock stuff
-extern clock_t clock;
-extern volatile uint32_t clock_ticks;
-
-// Buttons
-button_t buttons[BUTTON_COUNT];
-bool_t longPress, multiPress;
-
-
 #endif

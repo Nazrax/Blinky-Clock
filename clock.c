@@ -7,6 +7,7 @@ volatile uint32_t clock_ticks;
 clock_t clock;
 
 bool_t clock_ticked = false;
+int8_t adjustment = 0;
 
 // The clock uses timer 2 in async mode
 void clock_init() {
@@ -30,8 +31,10 @@ void clock_update() {
         clock.minutes = 0;
         clock.hours++;
 
-        if (clock.hours > 23)
+        if (clock.hours > 23) {
           clock.hours = 0;
+          clock.subseconds += adjustment;
+        }
       }
     }
   }
