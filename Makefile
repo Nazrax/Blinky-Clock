@@ -17,8 +17,8 @@
 ##### See the http://electrons.psychogenic.com/ 
 ##### website for detailed instructions
 
-MCU=atmega88
-PROGRAMMER_MCU=m88
+MCU=atmega88p
+PROGRAMMER_MCU=m88p
 
 # Name of our project
 # (use a single word, e.g. 'myproject')
