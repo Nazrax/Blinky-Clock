@@ -197,7 +197,7 @@ hex: $(HEXTRG)
 writeflash: hex
 	$(AVRDUDE) -c $(AVRDUDE_PROGRAMMERID)   \
 	 -p $(PROGRAMMER_MCU) -P $(AVRDUDE_PORT) -e        \
-	 -U flash:w:$(HEXROMTRG)
+	 -U flash:w:$(HEXROMTRG) -U eeprom:w:$(PROJECTNAME).ee.hex
 
 fuses:
 	$(AVRDUDE) -c $(AVRDUDE_PROGRAMMERID)   \
