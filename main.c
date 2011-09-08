@@ -2,6 +2,7 @@
 #include "display.h"
 #include "clock.h"
 #include "buttons.h"
+#include "alarm.h"
 
 #include <avr/interrupt.h>
 #include <avr/sleep.h>
@@ -12,18 +13,22 @@ void handle_buttons(void);
 void handle_display(void);
 void handle_display_setting(void);
 void handle_display_modename(void);
-void handle_alarm(void);
 void update_eeprom(void);
 void fetch_eeprom(void);
+void handle_mode_switch(void);
 
 static mode_t mode = mode_off;
 static uint32_t last_mode_switch_ticks = 0;
-static int16_t alarm_time = 0;
-static int16_t nap_time = 0;
+static int16_t nap_duration = 0;
 static bool_t dirty;
 
+int16_t alarm_time = 0;
+int16_t nap_time = 0;
+bool_t nap_enabled = false;
+bool_t alarm_active = false;
+
 static uint8_t EEMEM eeprom_adjustment = 0;
-static uint16_t EEMEM eeprom_nap_time = 0;
+static uint16_t EEMEM eeprom_nap_duration = 0;
 static uint16_t EEMEM eeprom_alarm_time = 0;
 
 void update_eeprom() {
@@ -31,7 +36,7 @@ void update_eeprom() {
     if (mode == mode_alarm) {
       eeprom_write_word(&eeprom_alarm_time, alarm_time);
     } else if (mode == mode_nap) {
-      eeprom_write_word(&eeprom_nap_time, nap_time);
+      eeprom_write_word(&eeprom_nap_duration, nap_duration);
     } else if (mode == mode_adjustment) {
       eeprom_write_byte(&eeprom_adjustment, adjustment);
     }
@@ -41,16 +46,13 @@ void update_eeprom() {
 
 void fetch_eeprom() {
   alarm_time = eeprom_read_word(&eeprom_alarm_time);
-  nap_time = eeprom_read_word(&eeprom_nap_time);
+  nap_duration = eeprom_read_word(&eeprom_nap_duration);
   adjustment = eeprom_read_byte(&eeprom_adjustment);
 }
 
 void init() {
   CLKPR = _BV(CLKPCE); // Enable prescaler change
   CLKPR = 0; // No prescaler = run at 8 Mhz
-
-  // What's this for?
-  DDRD |= _BV(DDD6);
 
   // Configure pull-ups for buttons
   PORTB |= _BV(PORTB0);
@@ -65,9 +67,13 @@ void init() {
   buttons[2].port = &PIND;
   buttons[3].pin = PIND5; // Top
   buttons[3].port = &PIND;
-
-  display_init();
   fetch_eeprom();
+}
+
+void handle_mode_switch() {
+  update_eeprom();
+  last_mode_switch_ticks = clock_ticks;
+  display_show();
 }
 
 // 0: Up
@@ -92,14 +98,21 @@ void handle_buttons() {
       } else if (pressed(&buttons[1])) { // Down
         delta = -1;
       } else if (pressed(&buttons[2])) { // Mode
-        update_eeprom();
+        handle_mode_switch();
+
         if (mode >= mode_nap) {
           mode = mode_clock;
         } else {
           mode++;
         }
       } else if (pressed(&buttons[3])) { // Top
-        // TODO: Set or clear alarm
+        if (alarm_active) {
+          nap_enabled = false;
+          alarm_off();
+        } else {
+          nap_enabled = true;
+          nap_time = clock_ticks + nap_duration * 60 * TICKS_PER_SECOND;
+        }
       }
     }
 
@@ -129,11 +142,11 @@ void handle_buttons() {
         }
       } else if (mode == mode_nap) {
         dirty = true;
-        nap_time += delta;
-        if (nap_time >= 60 * 24) {
-          nap_time = 0;
-        } else if (nap_time < 0) {
-          nap_time = 60 * 24 - 1;
+        nap_duration += delta;
+        if (nap_duration >= 60 * 24) {
+          nap_duration = 0;
+        } else if (nap_duration < 0) {
+          nap_duration = 60 * 24 - 1;
         }
       } else if (mode == mode_adjustment) {
         dirty = true;
@@ -143,10 +156,10 @@ void handle_buttons() {
   } else { // multipress
     if (buttons[2].current) {
       if (pressed(&buttons[0])) {
-        update_eeprom();
+        handle_mode_switch();
         mode = mode_seconds;
       } else if (pressed(&buttons[1])) {
-        update_eeprom();
+        handle_mode_switch();
         mode = mode_adjustment;
       }
     }
@@ -199,8 +212,8 @@ void handle_display_setting() {
     toDisplay[3] = (alarm_minutes % 10);
     toDisplay[4] = CHAR_BLANK;
   } else if (mode == mode_nap) {
-    uint8_t nap_minutes = nap_time % 60;
-    uint8_t nap_hours = nap_time / 60;
+    uint8_t nap_minutes = nap_duration % 60;
+    uint8_t nap_hours = nap_duration / 60;
     toDisplay[0] = (nap_hours / 10) % 10;
     toDisplay[1] = nap_hours % 10; 
     toDisplay[2] = (nap_minutes / 10) % 10;
@@ -240,14 +253,11 @@ void handle_display() {
   }
 }
 
-void handle_alarm() {
-}
-
 int main(void) {
   init();
-
+  alarm_init();
   clock_init();
-  display_show();
+  display_init();
 
   sei();
 
@@ -257,7 +267,7 @@ int main(void) {
 
     handle_buttons();
     handle_display();
-    handle_alarm();
+    alarm_sweep();
 
     buttons_age();
     clock_ticked = false;

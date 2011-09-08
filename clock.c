@@ -1,5 +1,6 @@
 #include "globals.h"
 #include "clock.h"
+#include "alarm.h"
 
 #include <avr/interrupt.h>
 
@@ -36,12 +37,16 @@ void clock_update() {
           clock.subseconds += adjustment;
         }
       }
+
+      alarm_check();
     }
   }
 }
 
 // The clock
 ISR(TIMER2_COMPA_vect) {
+  led_toggle();
+
   clock_ticks++;
   clock.subseconds++;
   clock_ticked = true;

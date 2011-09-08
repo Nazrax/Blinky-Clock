@@ -9,7 +9,15 @@
 #define BUTTON_COUNT 4
 #define TICKS_PER_SECOND 32
 
+#define SWEEP_SPEED 1
+
 #include <avr/io.h>
 #include <util/delay.h>
+
+extern int16_t alarm_time;
+extern int16_t nap_time;
+extern bool_t nap_enabled;
+extern bool_t alarm_active;
+
 
 #endif
