@@ -58,8 +58,13 @@ void display_show() {
 }
 
 void display_blank() {
+  int i;
   PORTB &= ~(_BV(PORTB5) | _BV(PORTB4));
   PORTC &= ~(_BV(PORTC4) | _BV(PORTC3) | _BV(PORTC1));
+
+  for(i=0; i<7; i++) {
+    set_segment(i, seven_seg_digits[CHAR_BLANK][i]);
+  }
 }
 
 void display_hide() {
