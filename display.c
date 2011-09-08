@@ -51,7 +51,7 @@ void display_init() {
 }
 
 void display_show() {
-  TCCR1A |= _BV(WGM11); // CTC mode, top = OCRA
+  TCCR1A = 0; // Normal mode (Can't get CTC to work right, so reset TCNT1 in the interrupt)
   TCCR1B |= _BV(CS12) | _BV(CS10); // Clock / 1024
   OCR1A = 20; // Fire about 40 times / second (@8Mhz)
   TIMSK1 |= _BV(OCIE1A); // Enable CTC interrupt for OCRaA
@@ -69,13 +69,14 @@ void display_blank() {
 
 void display_hide() {
   // Stop timer
-  TCCR0B = 0;
+  TCCR1B = 0;
 
   display_blank();
 }
 
 ISR(TIMER1_COMPA_vect) {
   int i;
+  TCNT1 = 0;
   display_blank();
 
   current_digit++;
