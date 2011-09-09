@@ -18,13 +18,13 @@ void alarm_check() {
   if ((alarm_minutes == clock.minutes && alarm_hours == clock.hours) ||
       (nap_enabled && nap_time < clock_ticks)) {
     alarm_on();
-  } else if (alarm_active && clock_ticks > alarm_activated_at + (uint32_t)TICKS_PER_SECOND * 60 * 90) {
+  } else if ((status == status_alarm) && clock_ticks > alarm_activated_at + (uint32_t)TICKS_PER_SECOND * 60 * 90) {
     alarm_off();
   }
 }
 
 void alarm_on(void) {
-  if (!alarm_active) {
+  if (!(status == status_alarm)) {
     alarm_activated_at = clock_ticks;
   }
 
@@ -35,7 +35,7 @@ void alarm_on(void) {
   TCCR0B = _BV(CS00); // F_CPU
   OCR0A = brightness;
 
-  alarm_active = true;
+  status = status_alarm;
 }
 
 void alarm_off(void) {
@@ -43,11 +43,11 @@ void alarm_off(void) {
   TCCR0B = 0;
   TCNT0 = 0;
   led_off();
-  alarm_active = false;
+  status = status_none;
 }
 
 void alarm_sweep(void) {
-  if (alarm_active) {
+  if (status == status_alarm) {
     if (brightness < 1) {
       direction = 1;
     } else if (brightness > 254) {

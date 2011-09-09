@@ -13,9 +13,10 @@ void handle_buttons(void);
 void handle_display(void);
 void handle_display_setting(void);
 void handle_display_modename(void);
+void handle_mode_switch(void);
+void handle_led(void);
 void update_eeprom(void);
 void fetch_eeprom(void);
-void handle_mode_switch(void);
 
 static mode_t mode = mode_off;
 static uint32_t last_mode_switch_ticks = 0;
@@ -25,8 +26,9 @@ static bool_t dirty;
 int16_t alarm_time = 0;
 uint32_t nap_time = 0;
 bool_t nap_enabled = false;
-bool_t alarm_active = false;
 uint32_t alarm_activated_at = 0;
+status_t status = status_none;
+uint32_t status_ticks = 0;
 
 static uint8_t EEMEM eeprom_adjustment = 0;
 static uint16_t EEMEM eeprom_nap_duration = 0;
@@ -107,7 +109,7 @@ void handle_buttons() {
           mode++;
         }
       } else if (pressed(&buttons[3])) { // Top
-        if (alarm_active) {
+        if (status == status_alarm) {
           nap_enabled = false;
           alarm_off();
         } else {
@@ -261,6 +263,32 @@ void handle_display() {
   }
 }
 
+void handle_led() {
+  if (status == status_none) {
+    led_off();
+  } else if (status == status_success) {
+    uint32_t elapsed = clock_ticks - status_ticks;
+    if (elapsed < TICKS_PER_SECOND * 2) {
+      if (elapsed % (TICKS_PER_SECOND / 2) < (TICKS_PER_SECOND / 4)) {
+        led_on();
+      } else {
+        led_off();
+      }
+    } else {
+      status = status_none;
+    }
+  } else if (status == status_error) {
+    uint32_t elapsed = clock_ticks - status_ticks;
+    if (elapsed < TICKS_PER_SECOND * 3) {
+      led_on();
+    } else {
+      status = status_none;
+    }
+  } else if (status == status_alarm) {
+    alarm_sweep();
+  }
+}
+
 int main(void) {
   init();
   alarm_init();
@@ -275,7 +303,7 @@ int main(void) {
 
     handle_buttons();
     handle_display();
-    alarm_sweep();
+    handle_led();
 
     buttons_age();
     clock_ticked = false;

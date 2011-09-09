@@ -4,6 +4,7 @@
 typedef enum {false, true} bool_t;
 typedef enum { UP, DOWN } button_state_t;
 typedef enum { mode_off, mode_clock, mode_alarm, mode_nap, mode_seconds, mode_adjustment } mode_t;
+typedef enum { status_none, status_success, status_error, status_alarm } status_t;
 
 typedef struct {
   int16_t subseconds;
