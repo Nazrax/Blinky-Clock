@@ -119,6 +119,7 @@ void handle_buttons() {
 
     if (delta != 0) {
       if (mode == mode_clock) {
+        cli();
         clock.minutes += delta;
         if (clock.minutes > 59) {
           clock.minutes = 0;
@@ -133,6 +134,7 @@ void handle_buttons() {
             clock.hours = 23;
           }
         }
+        sei();
       } else if (mode == mode_alarm) {
         dirty = true;
         alarm_time += delta;
@@ -152,6 +154,11 @@ void handle_buttons() {
       } else if (mode == mode_adjustment) {
         dirty = true;
         adjustment += delta;
+      } else if (mode == mode_seconds) {
+        cli();
+        clock.subseconds = 0;
+        clock.seconds = 0;
+        sei();
       }
     }
   } else { // multipress
