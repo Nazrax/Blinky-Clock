@@ -247,11 +247,19 @@ void handle_display_setting() {
     toDisplay[3] = (clock.subseconds % 10);
     toDisplay[4] = (clock.seconds % 2 == 0) ? CHAR_BLANK : CHAR_COLON;
   } else if (mode == mode_adjustment) {
-    toDisplay[0] = (adjustment < 0) ? CHAR_MINUS : CHAR_BLANK;
-    toDisplay[1] = (adjustment / 100) % 10;
-    toDisplay[2] = (adjustment / 10) % 10;
-    toDisplay[3] = adjustment % 10;
-    toDisplay[4] = CHAR_BLANK;
+    if (adjustment < 0) {
+      toDisplay[0] = CHAR_MINUS;
+      toDisplay[1] = (-adjustment / 100) % 10;
+      toDisplay[2] = (-adjustment / 10) % 10;
+      toDisplay[3] = -adjustment % 10;
+      toDisplay[4] = CHAR_BLANK;
+    } else {
+      toDisplay[0] = CHAR_BLANK;
+      toDisplay[1] = (adjustment / 100) % 10;
+      toDisplay[2] = (adjustment / 10) % 10;
+      toDisplay[3] = adjustment % 10;
+      toDisplay[4] = CHAR_BLANK;
+    }
   }
 }
 
