@@ -4,7 +4,7 @@
 
 #include <avr/io.h>
 
-static uint8_t brightness = 0;
+static int16_t brightness = 0;
 static int8_t direction = 1;
 
 int led_status(void) {
@@ -48,13 +48,16 @@ void alarm_off(void) {
 
 void alarm_sweep(void) {
   if (status == status_alarm) {
+    brightness += direction * SWEEP_SPEED;
+
     if (brightness < 1) {
+      brightness = 1;
       direction = 1;
     } else if (brightness > 254) {
+      brightness = 254;
       direction = -1;
     }
 
-    brightness += direction * SWEEP_SPEED;
     OCR0A = brightness;
   }
 }
