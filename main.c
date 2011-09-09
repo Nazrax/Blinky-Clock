@@ -22,6 +22,7 @@ static mode_t mode = mode_off;
 static uint32_t last_mode_switch_ticks = 0;
 static int16_t nap_duration = 0;
 static bool_t dirty;
+static bool_t clock_set = false;
 
 int16_t alarm_time = 0;
 uint32_t nap_time = 0;
@@ -128,6 +129,7 @@ void handle_buttons() {
     if (delta != 0) {
       if (mode == mode_clock) {
         cli();
+        clock_set = true;
         clock.minutes += delta;
         if (clock.minutes > 59) {
           clock.minutes = 0;
@@ -270,7 +272,13 @@ void handle_display() {
 }
 
 void handle_led() {
-  if (status == status_none) {
+  if (!clock_set) {
+    if (clock.seconds & 1) { // On for a second, off for a second
+      led_on();
+    } else {
+      led_off();
+    } 
+  } else if (status == status_none) {
     led_off();
   } else if (status == status_success) {
     uint32_t elapsed = clock_ticks - status_ticks;
