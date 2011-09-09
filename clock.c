@@ -45,8 +45,6 @@ void clock_update() {
 
 // The clock
 ISR(TIMER2_COMPA_vect) {
-  led_toggle();
-
   clock_ticks++;
   clock.subseconds++;
   clock_ticked = true;
