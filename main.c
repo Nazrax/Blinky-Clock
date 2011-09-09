@@ -299,7 +299,9 @@ void handle_led() {
       status = status_none;
     }
   } else if (status == status_alarm) {
-    alarm_sweep();
+    if (clock_ticked) {
+      alarm_sweep();
+    }
   }
 }
 

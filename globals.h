@@ -9,7 +9,7 @@
 #define BUTTON_COUNT 4
 #define TICKS_PER_SECOND 32
 
-#define SWEEP_SPEED 1
+#define SWEEP_SPEED 8
 
 #include <avr/io.h>
 #include <util/delay.h>
