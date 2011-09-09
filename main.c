@@ -117,10 +117,12 @@ void handle_buttons() {
           if (nap_enabled) {
             nap_enabled = false;
             status = status_error;
+            status_ticks = clock_ticks;
           } else {
             nap_enabled = true;
             nap_time = clock_ticks + nap_duration * 60 * TICKS_PER_SECOND;
             status = status_success;
+            status_ticks = clock_ticks;
           }
         }
       }
@@ -290,6 +292,7 @@ void handle_led() {
       }
     } else {
       status = status_none;
+      status_ticks = clock_ticks;
     }
   } else if (status == status_error) {
     uint32_t elapsed = clock_ticks - status_ticks;
@@ -297,6 +300,7 @@ void handle_led() {
       led_on();
     } else {
       status = status_none;
+      status_ticks = clock_ticks;
     }
   } else if (status == status_alarm) {
     if (clock_ticked) {
