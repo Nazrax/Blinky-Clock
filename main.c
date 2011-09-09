@@ -23,9 +23,10 @@ static int16_t nap_duration = 0;
 static bool_t dirty;
 
 int16_t alarm_time = 0;
-int16_t nap_time = 0;
+uint32_t nap_time = 0;
 bool_t nap_enabled = false;
 bool_t alarm_active = false;
+uint32_t alarm_activated_at = 0;
 
 static uint8_t EEMEM eeprom_adjustment = 0;
 static uint16_t EEMEM eeprom_nap_duration = 0;

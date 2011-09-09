@@ -15,7 +15,8 @@
 #include <util/delay.h>
 
 extern int16_t alarm_time;
-extern int16_t nap_time;
+extern uint32_t nap_time;
+extern uint32_t alarm_activated_at;
 extern bool_t nap_enabled;
 extern bool_t alarm_active;
 

@@ -18,10 +18,16 @@ void alarm_check() {
   if ((alarm_minutes == clock.minutes && alarm_hours == clock.hours) ||
       (nap_enabled && nap_time < clock_ticks)) {
     alarm_on();
+  } else if (alarm_active && clock_ticks > alarm_activated_at + (uint32_t)TICKS_PER_SECOND * 60 * 90) {
+    alarm_off();
   }
 }
 
 void alarm_on(void) {
+  if (!alarm_active) {
+    alarm_activated_at = clock_ticks;
+  }
+
   brightness = 0;
   direction = 1;
 
