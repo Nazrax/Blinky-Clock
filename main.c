@@ -113,8 +113,14 @@ void handle_buttons() {
           nap_enabled = false;
           alarm_off();
         } else {
-          nap_enabled = true;
-          nap_time = clock_ticks + nap_duration * 60 * TICKS_PER_SECOND;
+          if (nap_enabled) {
+            nap_enabled = false;
+            status = status_error;
+          } else {
+            nap_enabled = true;
+            nap_time = clock_ticks + nap_duration * 60 * TICKS_PER_SECOND;
+            status = status_success;
+          }
         }
       }
     }
