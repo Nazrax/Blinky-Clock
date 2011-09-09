@@ -129,6 +129,7 @@ void handle_buttons() {
     }
 
     if (delta != 0) {
+      last_mode_switch_ticks = 0;
       if (mode == mode_clock) {
         cli();
         clock_set = true;
