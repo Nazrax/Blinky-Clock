@@ -120,7 +120,7 @@ void handle_buttons() {
             status_ticks = clock_ticks;
           } else {
             nap_enabled = true;
-            nap_time = clock_ticks + nap_duration * 60 * TICKS_PER_SECOND;
+            nap_time = clock_ticks + (uint32_t)nap_duration * (uint32_t)60 * (uint32_t)TICKS_PER_SECOND;
             status = status_success;
             status_ticks = clock_ticks;
           }
