@@ -31,9 +31,9 @@ uint32_t alarm_activated_at = 0;
 status_t status = status_none;
 uint32_t status_ticks = 0;
 
-static uint8_t EEMEM eeprom_adjustment = 0;
-static uint16_t EEMEM eeprom_nap_duration = 0;
-static uint16_t EEMEM eeprom_alarm_time = 0;
+static uint8_t EEMEM eeprom_adjustment = 80;
+static uint16_t EEMEM eeprom_nap_duration = 180; // 3 hours
+static uint16_t EEMEM eeprom_alarm_time = 420; // 7 AM
 
 void update_eeprom() {
   if (dirty) {
@@ -52,6 +52,13 @@ void fetch_eeprom() {
   alarm_time = eeprom_read_word(&eeprom_alarm_time);
   nap_duration = eeprom_read_word(&eeprom_nap_duration);
   adjustment = eeprom_read_byte(&eeprom_adjustment);
+
+  if(alarm_time > 60 * 24) {
+    alarm_time = 420;
+  }
+  if (nap_duration > 60 * 24) {
+    nap_duration = 180;
+  }
 }
 
 void init() {
