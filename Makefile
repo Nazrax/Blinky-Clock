@@ -202,7 +202,7 @@ writeflash: hex
 fuses:
 	$(AVRDUDE) -c $(AVRDUDE_PROGRAMMERID)   \
 	 -p $(PROGRAMMER_MCU) -P $(AVRDUDE_PORT) -e        \
-	 -U lfuse:w:0xff:m
+	 -U lfuse:w:0x62:m -U hfuse:w:0xde:m -U efuse:w:0x1:m
 
 install: writeflash
 
