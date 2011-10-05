@@ -9,6 +9,9 @@
 #define BUTTON_COUNT 4
 #define TICKS_PER_SECOND 32
 
+#define DISPLAY_TIMEOUT 90 // 90 seconds
+#define ALARM_TIMEOUT 5400 // 90 minutes
+
 #define SWEEP_SPEED 8
 
 #include <avr/io.h>

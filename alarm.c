@@ -18,7 +18,8 @@ void alarm_check() {
   if ((alarm_minutes == clock.minutes && alarm_hours == clock.hours) ||
       (nap_enabled && nap_time < clock_ticks)) {
     alarm_on();
-  } else if ((status == status_alarm) && clock_ticks > alarm_activated_at + (uint32_t)TICKS_PER_SECOND * 60 * 90) {
+    nap_enabled = false;
+  } else if ((status == status_alarm) && clock_ticks > alarm_activated_at + (uint32_t)TICKS_PER_SECOND * (uint32_t)ALARM_TIMEOUT) {
     nap_enabled = false;
     alarm_off();
   }

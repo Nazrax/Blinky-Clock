@@ -270,7 +270,7 @@ void handle_display() {
     uint32_t ticks_since_mode_change = clock_ticks - last_mode_switch_ticks;
     uint32_t ticks_since_button = clock_ticks - last_button_press_ticks;
 
-    if (ticks_since_button > TICKS_PER_SECOND * 90) {
+    if (ticks_since_button > (uint32_t)TICKS_PER_SECOND * (uint32_t)DISPLAY_TIMEOUT) {
       display_hide();
       update_eeprom();
       mode = mode_off;
