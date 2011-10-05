@@ -102,6 +102,11 @@ void handle_buttons() {
         } else if (buttons[1].current) { // Down
           delta = -1;
         }
+        if (mode == mode_clock) {
+          delta *= 3;
+        } else {
+          delta *= 2;
+        }
       }
     } else { // Not long press
       if (pressed(&buttons[0])) { // Up
