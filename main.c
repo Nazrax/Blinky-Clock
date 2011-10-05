@@ -350,8 +350,11 @@ int main(void) {
     clock_ticked = false;
 
     // Check display timeout
-
-    set_sleep_mode(SLEEP_MODE_IDLE);
+    if (mode != mode_off || status != status_none || !clock_set) { // Need the main clock
+      set_sleep_mode(SLEEP_MODE_IDLE);
+    } else {
+      set_sleep_mode(SLEEP_MODE_PWR_SAVE);
+    }
     sleep_enable();
     sleep_cpu();
     sleep_disable();
