@@ -37,7 +37,7 @@ void buttons_update() {
     if (buttons[i].current == DOWN) {
       pressCount++;
       uint32_t duration = clock_ticks - buttons[i].update_time;
-      if (duration > TICKS_PER_SECOND)
+      if (duration > TICKS_PER_SECOND / 2)
         longPress = true;
     }
   }
